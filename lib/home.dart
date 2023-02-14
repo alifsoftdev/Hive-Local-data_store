@@ -11,7 +11,7 @@ class _Home_PageState extends State<Home_Page> {
   Box? notepad;
   @override
   void initState() {
-    notepad = Hive.box('authBox');
+    notepad = Hive.box('notepad');
     super.initState();
   }
 
@@ -56,84 +56,90 @@ class _Home_PageState extends State<Home_Page> {
               height: 10,
             ),
             Expanded(
-              child: ListView.builder(
-                  itemCount: notepad!.keys.toList().length,
-                  itemBuilder: (_, index) {
-                    return Card(
-                      elevation: 5,
-                      child: ListTile(
-                        title: Text(notepad!.getAt(index).toString()),
-                        trailing: SizedBox(
-                          width: 100,
-                          child: Row(
-                            children: [
-                              IconButton(
-                                  onPressed: () async {
-                                    showDialog(
-                                        context: context,
-                                        builder: (_) {
-                                          return Dialog(
-                                            child: Container(
-                                              height: 200,
-                                              child: Padding(
-                                                padding: EdgeInsets.all(20.0),
-                                                child: Column(
-                                                  children: [
-                                                    TextField(
-                                                      controller:
-                                                          _updateController,
-                                                      decoration: InputDecoration(
-                                                          hintText:
-                                                              'write something'),
-                                                    ),
-                                                    SizedBox(
-                                                      height: 10,
-                                                    ),
-                                                    ElevatedButton(
-                                                        onPressed: () async {
-                                                          final updateData =
-                                                              _updateController
-                                                                  .text;
-                                                          notepad!.putAt(index,
-                                                              updateData);
-                                                          _updateController
-                                                              .clear();
-                                                          Fluttertoast.showToast(
-                                                              msg:
-                                                                  "updated successfully");
-                                                          Navigator.pop(
-                                                              context);
-                                                        },
-                                                        child: Text("Update"))
-                                                  ],
+              child: ValueListenableBuilder(
+                valueListenable: Hive.box('notepad').listenable(),
+                builder: (context, box, widget) {
+                  return ListView.builder(
+                    itemCount: notepad!.keys.toList().length,
+                    itemBuilder: (_, index) {
+                      return Card(
+                        elevation: 5,
+                        child: ListTile(
+                          title: Text(notepad!.getAt(index).toString()),
+                          trailing: SizedBox(
+                            width: 100,
+                            child: Row(
+                              children: [
+                                IconButton(
+                                    onPressed: () async {
+                                      showDialog(
+                                          context: context,
+                                          builder: (_) {
+                                            return Dialog(
+                                              child: Container(
+                                                height: 200,
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(20.0),
+                                                  child: Column(
+                                                    children: [
+                                                      TextField(
+                                                        controller:
+                                                            _updateController,
+                                                        decoration: InputDecoration(
+                                                            hintText:
+                                                                'write something'),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      ElevatedButton(
+                                                          onPressed: () async {
+                                                            final updateData =
+                                                                _updateController
+                                                                    .text;
+                                                            notepad!.putAt(index,
+                                                                updateData);
+                                                            _updateController
+                                                                .clear();
+                                                            Fluttertoast.showToast(
+                                                                msg:
+                                                                    "updated successfully");
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child: Text("Update"))
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          );
-                                        });
-                                  },
-                                  icon: Icon(
-                                    Icons.edit,
-                                    color: Colors.green,
-                                  )),
-                              IconButton(
-                                  onPressed: () async {
-                                    try {
-                                      await notepad!.deleteAt(index);
-                                      Fluttertoast.showToast(
-                                          msg: "Deleted successfully");
-                                    } catch (e) {}
-                                  },
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  )),
-                            ],
+                                            );
+                                          });
+                                    },
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: Colors.green,
+                                    )),
+                                IconButton(
+                                    onPressed: () async {
+                                      try {
+                                        await notepad!.deleteAt(index);
+                                        Fluttertoast.showToast(
+                                            msg: "Deleted successfully");
+                                      } catch (e) {}
+                                    },
+                                    icon: Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    )),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    });
+                },
+                 
+              ),
             ),
           ],
         ),
